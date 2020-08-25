@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="logs_depth_array">
+        <item>@string/logs_depth_array0</item>
+        <item>@string/logs_depth_array1</item>
+        <item>@string/logs_depth_array2</item>
+        <item>@string/logs_depth_array12</item>
+        <item>@string/logs_depth_array24</item>
+        <item>@string/logs_depth_array48</item>
+        <item>@string/logs_depth_array72</item>
+        <item>@string/logs_depth_array120</item>
+        <item>@string/logs_depth_array240</item>
+    </array>
+    <array name="logs_depth_values">
+        <item>@null</item>
+        <item>1</item>
+        <item>2</item>
+        <item>12</item>
+        <item>24</item>
+        <item>48</item>
+        <item>72</item>
+        <item>120</item>
+        <item>240</item>
+    </array>
+    <array name="widget_actions_array">
+        <item>@string/widget_actions_array0</item>
+        <item>@string/widget_actions_array1</item>
+    </array>
+    <array name="widget_actions_values">
+        <item>@null</item>
+        <item>1</item>
+    </array>
+</resources>

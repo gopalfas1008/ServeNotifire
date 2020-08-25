@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/settings_category_general">
+        <EditTextPreference android:selectAllOnFocus="true" android:title="@string/settings_timeout" android:key="timeout" android:defaultValue="@integer/default_timeout" android:inputType="numberSigned"/>
+        <SwitchPreference android:title="@string/settings_allow_roaming" android:key="allow_roaming" android:defaultValue="@bool/default_allow_roaming"/>
+        <ListPreference android:entries="@array/logs_depth_array" android:title="@string/settings_logs_depth" android:key="logs_depth" android:defaultValue="@integer/default_logs_depth" android:entryValues="@array/logs_depth_values"/>
+        <ListPreference android:entries="@array/widget_actions_array" android:title="@string/settings_widget_action" android:key="widget_action" android:defaultValue="@integer/default_widget_action" android:entryValues="@array/widget_actions_values"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_notifications">
+        <SwitchPreference android:title="@string/settings_enable_notifications" android:key="enable_notifications" android:defaultValue="@bool/default_enable_notifications"/>
+        <RingtonePreference android:title="@string/settings_ringtone" android:key="notifications_ringtone" android:dependency="enable_notifications" android:defaultValue="@string/default_notifications_ringtone" android:ringtoneType="notification"/>
+        <SwitchPreference android:title="@string/settings_vibrate" android:key="notifications_vibrate" android:dependency="enable_notifications" android:defaultValue="@bool/default_notifications_vibrate"/>
+    </PreferenceCategory>
+</PreferenceScreen>

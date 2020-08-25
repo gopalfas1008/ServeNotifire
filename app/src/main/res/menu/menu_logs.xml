@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:icon="@drawable/ic_refresh_24dp" android:id="@+id/action_logs_refresh" android:orderInCategory="1" android:title="@string/activity_logs_refresh" app:showAsAction="always"/>
+    <item android:icon="@drawable/ic_delete_24dp" android:id="@+id/action_logs_clear" android:orderInCategory="2" android:title="@string/activity_logs_clear" app:showAsAction="always"/>
+</menu>

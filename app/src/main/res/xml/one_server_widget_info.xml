@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:minWidth="40dp" android:minHeight="40dp" android:updatePeriodMillis="3600000" android:initialLayout="@layout/one_server_widget" android:configure="flambyco.serverofflinenotifier.activity.ServerSelectActivity"/>
