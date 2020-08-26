@@ -70,14 +70,14 @@ public class ServerDAO extends DAOBase {
 
     public static Server cursorToServer(Cursor cursor) {
         boolean z = true;
-        Integer valueOf = Integer.valueOf(cursor.getInt(0));
+        Integer valueOf = cursor.getInt(0);
         String string = cursor.getString(1);
         String string2 = cursor.getString(2);
-        Integer valueOf2 = Integer.valueOf(cursor.getInt(3));
-        Integer valueOf3 = Integer.valueOf(cursor.getInt(4));
-        Integer valueOf4 = Integer.valueOf(cursor.getInt(5));
-        Integer valueOf5 = Integer.valueOf(cursor.getInt(6));
-        Long valueOf6 = Long.valueOf(cursor.getLong(7));
+        Integer valueOf2 = cursor.getInt(3);
+        Integer valueOf3 = cursor.getInt(4);
+        Integer valueOf4 = cursor.getInt(5);
+        Integer valueOf5 = cursor.getInt(6);
+        Long valueOf6 = cursor.getLong(7);
         if (cursor.getInt(8) != 1) {
             z = false;
         }

@@ -35,6 +35,7 @@ import com.shreehariji.servenotifire.adapter.ServerListCursorAdapter;
 import com.shreehariji.servenotifire.data.Server;
 import com.shreehariji.servenotifire.data.ServerDAO;
 import com.shreehariji.servenotifire.data.WidgetDAO;
+import com.shreehariji.servenotifire.receiver.TestJobService;
 import com.shreehariji.servenotifire.tools.ServerAutoCheckerScheduler;
 import com.shreehariji.servenotifire.tools.ServerChecker;
 
@@ -67,6 +68,7 @@ public class ServerListActivity extends AppCompatActivity {
 
         loadServerList();
         ServerAutoCheckerScheduler.InitiateAllAlarms(this);
+        TestJobService.scheduleJob(this); // reschedule the job
         registerUpdateReceiver();
         disableBatteryOptimization();
     }

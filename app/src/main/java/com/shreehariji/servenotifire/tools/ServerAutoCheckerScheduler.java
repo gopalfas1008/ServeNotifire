@@ -31,7 +31,7 @@ public class ServerAutoCheckerScheduler {
         Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
         intent.putExtra("SERVER_ID", server.getId());
         int interval = server.getCheckInterval() * 60 * 1000;
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId(), intent, 0));
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId(), intent, 0));
         Log.i("Alarm added", server.getAddress());
     }
 
@@ -40,7 +40,7 @@ public class ServerAutoCheckerScheduler {
         Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
         intent.putExtra("SERVER_ID", server.getId());
         int interval = server.getCheckInterval() * 60 * 1000;
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId().intValue(), intent, 268435456));
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId().intValue(), intent, 268435456));
         Log.i("Alarm updated", server.getAddress());
     }
 
@@ -48,7 +48,7 @@ public class ServerAutoCheckerScheduler {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
         intent.putExtra("SERVER_ID", server_id);
-        alarmManager.cancel(PendingIntent.getBroadcast(context, server_id.intValue(), intent, 268435456));
+        alarmManager.cancel(PendingIntent.getBroadcast(context, server_id, intent, 268435456));
         Log.i("Alarm deleted", server_id.toString());
     }
 }

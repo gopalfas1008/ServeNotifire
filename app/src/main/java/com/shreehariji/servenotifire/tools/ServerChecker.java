@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -26,6 +27,8 @@ import com.shreehariji.servenotifire.data.Server;
 import com.shreehariji.servenotifire.data.ServerDAO;
 import com.shreehariji.servenotifire.data.WidgetDAO;
 import com.shreehariji.servenotifire.widget.OneServerWidgetProvider;
+
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -149,11 +152,24 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
         if (Boolean.valueOf(prefs.getBoolean("enable_notifications", Boolean.valueOf(this.context.getResources().getBoolean(R.bool.default_enable_notifications)).booleanValue())).booleanValue()) {
             NotificationManager manager = ((NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE));
 
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            try {
+                mediaPlayer = MediaPlayer.create(context, R.raw.smb_gameover);
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Notification.Builder mBuilder = new Notification.Builder(this.context).setSmallIcon(R.drawable.notify).setAutoCancel(true).setContentTitle(this.context.getString(R.string.app_name)).setContentText(contentText).setContentIntent(pendingIntent);
             String notifications_ringtone = prefs.getString("notifications_ringtone", this.context.getResources().getString(R.string.default_notifications_ringtone));
             if (!notifications_ringtone.equals("")) {
 //                mBuilder.setSound(Uri.parse(notifications_ringtone));
-                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_warning));
+//                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_gameover));
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -165,11 +181,11 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
                 channel.enableVibration(true);
                 channel.setLightColor(Color.BLUE);
                 channel.enableLights(true);
-                channel.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_gameover),
-                        new AudioAttributes.Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                                .build());
+//                channel.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_gameover),
+//                        new AudioAttributes.Builder()
+//                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//                                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+//                                .build());
                 //channel.canShowBadge();
                 // Did you mean to set the property to enable Show Badge?
                 channel.setShowBadge(true);

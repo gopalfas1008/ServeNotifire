@@ -47,8 +47,7 @@
     <string name="activity_server_list_empty_list">Empty list, please add a server</string>
     <string name="activity_server_list_enable">Enable auto check</string>
     <string name="activity_server_select_title">Select a server</string>
-    <string name="app_name">Server Offline Notifier</string>
-    <string name="banner_ad_unit_id">ca-app-pub-7910208847475730/1757332608</string>
+    <string name="app_name">Server Notifier</string>
     <string name="default_notifications_ringtone" />
     <string name="logs_depth_array0">Don\'t log</string>
     <string name="logs_depth_array1">1 hour</string>
@@ -79,9 +78,6 @@
     <string name="widget_actions_array1">Launch a manual check</string>
     <string name="widget_unknown_server">Unknown\10server</string>
     <string name="accept">Accept</string>
-    <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
-    <string name="auth_google_play_services_client_facebook_display_name">Facebook</string>
-    <string name="auth_google_play_services_client_google_display_name">Google</string>
     <string name="character_counter_pattern">%1$d/%2$d</string>
     <string name="create_calendar_message">Allow Ad to create a calendar event?</string>
     <string name="create_calendar_title">Create calendar event</string>
