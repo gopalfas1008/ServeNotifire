@@ -18,7 +18,7 @@ public class LogsActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView((int) R.layout.activity_logs);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_logs));
+//        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_logs));
         setupActionBar();
         loadLogs();
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shreehariji.servenotifire">
-    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="23"/>
+    <uses-sdk android:targetSdkVersion="23"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -17,8 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.shreehariji.servenotifire.activity.ServerListActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,8 +33,7 @@
         <activity
             android:name="com.shreehariji.servenotifire.activity.LogsActivity"
             android:label="@string/activity_logs_title"
-            android:parentActivityName="com.shreehariji.servenotifire.activity.ServerListActivity"
-            android:theme="@style/Theme.Design.NoActionBar" />
+            android:parentActivityName="com.shreehariji.servenotifire.activity.ServerListActivity" />
         <activity
             android:name="com.shreehariji.servenotifire.activity.ServerSelectActivity"
             android:label="@string/activity_server_select_title">

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.PowerManager;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -55,15 +56,17 @@ public class ServerListActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView((int) R.layout.activity_server_list);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+//        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ((FloatingActionButton) findViewById(R.id.addServer)).setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                Intent intent = new Intent(ServerListActivity.this.getApplicationContext(), ServerEditorActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ServerEditorActivity.class);
                 intent.putExtra(ServerEditorActivity.INTENT_KEYS.ACTION, ServerEditorActivity.ACTIONS.ADD);
-                ServerListActivity.this.startActivityForResult(intent, 1);
+                startActivityForResult(intent, 1);
             }
         });
+
         loadServerList();
+        ServerAutoCheckerScheduler.InitiateAllAlarms(this);
         registerUpdateReceiver();
         disableBatteryOptimization();
     }
@@ -72,10 +75,10 @@ public class ServerListActivity extends AppCompatActivity {
         this.serverListReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 Log.i("ServerListReceiver", "loadServerList()");
-                ServerListActivity.this.loadServerList();
+                loadServerList();
             }
         };
-        registerReceiver(this.serverListReceiver, new IntentFilter("com.com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
+        registerReceiver(this.serverListReceiver, new IntentFilter("com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
     }
 
     public void onDestroy() {
@@ -121,6 +124,7 @@ public class ServerListActivity extends AppCompatActivity {
                 view.showContextMenu();
             }
         });
+
         findViewById(R.id.lblEmptyList).setVisibility(cursor.getCount() > 0 ? 8 : 0);
     }
 

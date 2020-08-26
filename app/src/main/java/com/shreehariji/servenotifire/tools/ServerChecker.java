@@ -1,16 +1,21 @@
 package com.shreehariji.servenotifire.tools;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -54,25 +59,31 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
     /* access modifiers changed from: protected */
     public Void doInBackground(Void... params) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-        NetworkInfo activeNetwork = ((ConnectivityManager) this.context.getSystemService("connectivity")).getActiveNetworkInfo();
+        NetworkInfo activeNetwork = ((ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (activeNetwork == null || !activeNetwork.isConnected()) {
-            this.server.setCheckStatus(Integer.valueOf(3));
+            this.server.setCheckStatus(3);
         } else {
             if (activeNetwork.isRoaming()) {
-                if (!Boolean.valueOf(prefs.getBoolean("allow_roaming", Boolean.valueOf(this.context.getResources().getBoolean(R.bool.default_allow_roaming)).booleanValue())).booleanValue()) {
-                    this.server.setCheckStatus(Integer.valueOf(3));
+                if (!prefs.getBoolean("allow_roaming", this.context.getResources().getBoolean(R.bool.default_allow_roaming))) {
+                    this.server.setCheckStatus(3);
                 }
             }
             try {
                 HttpURLConnection connection = (HttpURLConnection) new URL(this.server.getAddress()).openConnection();
-                connection.setConnectTimeout(Integer.valueOf(prefs.getString("timeout", String.valueOf(this.context.getResources().getInteger(R.integer.default_timeout)))).intValue() * 1000);
+                connection.setConnectTimeout(Integer.parseInt(prefs.getString("timeout", String.valueOf(this.context.getResources().getInteger(R.integer.default_timeout)))) * 1000);
                 connection.connect();
                 this.connectionInfo = connection.getResponseCode() + " " + connection.getResponseMessage();
-                this.server.setCheckStatus(Integer.valueOf(1));
+                Log.i("Server check code",this.server.getAddress()+"=="+connection.getResponseCode()+"");
+                if (connection.getResponseCode()<500){
+                    this.server.setCheckStatus(1);
+                }else {
+                    this.server.setCheckStatus(0);
+                }
+                connection.disconnect();
             } catch (Exception e) {
                 Log.i("Server check error", e.toString());
                 this.connectionInfo = e.getMessage();
-                this.server.setCheckStatus(Integer.valueOf(0));
+                this.server.setCheckStatus(0);
             }
         }
         return null;
@@ -81,8 +92,8 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
     /* access modifiers changed from: protected */
     public void onPreExecute() {
         super.onPreExecute();
-        this.server.setCheckStatus(Integer.valueOf(2));
-        this.server.setCheckTimestamp(Long.valueOf(System.currentTimeMillis() / 1000));
+        this.server.setCheckStatus(2);
+        this.server.setCheckTimestamp(System.currentTimeMillis() / 1000);
         updateServerData();
         updateUI();
     }
@@ -106,8 +117,8 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
     private void automaticCheck() {
         switch (this.server.getCheckStatus().intValue()) {
             case 0:
-                this.server.setCheckFailCount(Integer.valueOf(this.server.getCheckFailCount().intValue() + 1));
-                if (this.server.getCheckFailCount().intValue() >= this.server.getCheckFailThreshold().intValue()) {
+                this.server.setCheckFailCount(this.server.getCheckFailCount().intValue() + 1);
+                if (this.server.getCheckFailCount() >= this.server.getCheckFailThreshold().intValue()) {
                     notifyOfflineServer();
                     break;
                 }
@@ -136,16 +147,40 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
         notificationIntent.setFlags(603979776);
         PendingIntent pendingIntent = PendingIntent.getActivity(this.context, 0, notificationIntent, 0);
         if (Boolean.valueOf(prefs.getBoolean("enable_notifications", Boolean.valueOf(this.context.getResources().getBoolean(R.bool.default_enable_notifications)).booleanValue())).booleanValue()) {
+            NotificationManager manager = ((NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE));
+
             Notification.Builder mBuilder = new Notification.Builder(this.context).setSmallIcon(R.drawable.notify).setAutoCancel(true).setContentTitle(this.context.getString(R.string.app_name)).setContentText(contentText).setContentIntent(pendingIntent);
             String notifications_ringtone = prefs.getString("notifications_ringtone", this.context.getResources().getString(R.string.default_notifications_ringtone));
             if (!notifications_ringtone.equals("")) {
-                mBuilder.setSound(Uri.parse(notifications_ringtone));
+//                mBuilder.setSound(Uri.parse(notifications_ringtone));
+                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_warning));
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String CHANNEL_ID = "Server_Test";
+
+                String CHANNEL_NAME = "Notification";
+                // I would suggest that you use IMPORTANCE_DEFAULT instead of IMPORTANCE_HIGH
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+                channel.enableVibration(true);
+                channel.setLightColor(Color.BLUE);
+                channel.enableLights(true);
+                channel.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.context.getPackageName() + "/" + R.raw.smb_gameover),
+                        new AudioAttributes.Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                                .build());
+                //channel.canShowBadge();
+                // Did you mean to set the property to enable Show Badge?
+                channel.setShowBadge(true);
+                manager.createNotificationChannel(channel);
             }
             if (Boolean.valueOf(prefs.getBoolean("notifications_vibrate", Boolean.valueOf(this.context.getResources().getBoolean(R.bool.default_notifications_vibrate)).booleanValue())).booleanValue()) {
                 Log.i("Notification vibration", "ok");
                 mBuilder.setVibrate(new long[]{0, 2000});
             }
-            ((NotificationManager) this.context.getSystemService("notification")).notify(this.server.getId().intValue(), mBuilder.build());
+
+            manager.notify(this.server.getId(), mBuilder.build());
         }
     }
 
@@ -158,7 +193,7 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
 
     private void updateUI() {
         updateWidgets();
-        this.context.sendBroadcast(new Intent("com.com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
+        this.context.sendBroadcast(new Intent("com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
     }
 
     private void updateWidgets() {

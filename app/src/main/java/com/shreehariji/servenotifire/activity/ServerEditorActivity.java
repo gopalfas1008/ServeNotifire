@@ -2,10 +2,24 @@ package com.shreehariji.servenotifire.activity;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.shreehariji.servenotifire.R;
+import com.shreehariji.servenotifire.data.Server;
+import com.shreehariji.servenotifire.data.ServerDAO;
+import com.shreehariji.servenotifire.tools.ServerAutoCheckerScheduler;
+
+@SuppressLint("WrongConstant")
 public class ServerEditorActivity extends AppCompatActivity {
     private static final String DEFAULT_ADDRESS = "http://";
     private static final Integer DEFAULT_CHECK_INTERVAL = Integer.valueOf(15);
@@ -24,116 +38,117 @@ public class ServerEditorActivity extends AppCompatActivity {
 
     /* access modifiers changed from: protected */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void onCreate(android.os.Bundle r13) {
-        /*
-            r12 = this;
-            r11 = 2131165223(0x7f070027, float:1.7944657E38)
-            r5 = 2131165211(0x7f07001b, float:1.7944633E38)
-            r3 = 1
-            r2 = -1
-            super.onCreate(r13)
-            r1 = 2130968603(0x7f04001b, float:1.7545864E38)
-            r12.setContentView(r1)
-            r12.setupActionBar()
-            r1 = 2131624057(0x7f0e0079, float:1.8875283E38)
-            android.view.View r7 = r12.findViewById(r1)
-            android.widget.Button r7 = (android.widget.Button) r7
-            com.shreehariji.servenotifire.activity.ServerEditorActivity$1 r1 = new com.shreehariji.servenotifire.activity.ServerEditorActivity$1
-            r1.<init>()
-            r7.setOnClickListener(r1)
-            android.content.Intent r8 = r12.getIntent()
-            java.lang.String r1 = "ACTION"
-            java.lang.String r1 = r8.getStringExtra(r1)
-            int r4 = r1.hashCode()
-            switch(r4) {
-                case -1785516855: goto L_0x0045;
-                case 64641: goto L_0x003b;
-                default: goto L_0x0036;
+    public void onCreate(Bundle savedInstanceState) {
+        boolean z;
+        Server server = null;
+        super.onCreate(savedInstanceState);
+        setContentView((int) R.layout.activity_server_editor);
+        setupActionBar();
+        Button btnValidate = (Button) findViewById(R.id.btnAdd);
+        btnValidate.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Integer server_check_interval;
+                Integer server_check_fail_threshold;
+                String server_name = ((EditText) findViewById(R.id.txtName)).getText().toString().trim();
+                if (server_name.equals("")) {
+                    Toast.makeText(getApplicationContext(), R.string.activity_server_editor_server_name_error, 1).show();
+                    return;
+                }
+                String server_address = ((EditText) findViewById(R.id.txtAddress)).getText().toString().trim();
+                if (server_address.equals("")) {
+                    Toast.makeText(getApplicationContext(), R.string.activity_server_editor_server_address_error, 1).show();
+                    return;
+                }
+                try {
+                    server_check_interval = Integer.valueOf(Integer.parseInt(((EditText) findViewById(R.id.txtCheckInterval)).getText().toString()));
+                } catch (Exception e) {
+                    server_check_interval = Integer.valueOf(0);
+                }
+                if (server_check_interval.intValue() <= 0) {
+                    Toast.makeText(getApplicationContext(), R.string.activity_server_editor_server_check_interval_error, 1).show();
+                    return;
+                }
+                try {
+                    server_check_fail_threshold = Integer.valueOf(Integer.parseInt(((EditText) findViewById(R.id.txtCheckFailThreshold)).getText().toString()));
+                } catch (Exception e2) {
+                    server_check_fail_threshold = Integer.valueOf(0);
+                }
+                if (server_check_fail_threshold.intValue() <= 0) {
+                    Toast.makeText(getApplicationContext(), R.string.activity_server_editor_server_check_fail_threshold, 1).show();
+                    return;
+                }
+                Server inputServer = new Server(Integer.valueOf(((EditText) findViewById(R.id.txtId)).getText().toString()), server_name, server_address, server_check_interval, server_check_fail_threshold);
+                ServerDAO serverDao = new ServerDAO(getApplicationContext());
+                serverDao.open();
+                Intent intent = getIntent();
+                String stringExtra = intent.getStringExtra(INTENT_KEYS.ACTION);
+                char c = 65535;
+                switch (stringExtra.hashCode()) {
+                    case -1785516855:
+                        if (stringExtra.equals(ACTIONS.UPDATE)) {
+                            c = 1;
+                            break;
+                        }
+                        break;
+                    case 64641:
+                        if (stringExtra.equals(ACTIONS.ADD)) {
+                            c = 0;
+                            break;
+                        }
+                        break;
+                }
+                switch (c) {
+                    case 0:
+                        inputServer.setId(Integer.valueOf((int) serverDao.add(inputServer)));
+                        intent.putExtra("SERVER_ID", inputServer.getId());
+                        ServerAutoCheckerScheduler.AddAlarm(getApplicationContext(), inputServer);
+                        Toast.makeText(getApplicationContext(), getString(R.string.activity_server_editor_toast_add, new Object[]{inputServer.getName()}), 1).show();
+                        break;
+                    case 1:
+                        inputServer.setCheckFailCount(Integer.valueOf(0));
+                        serverDao.update(inputServer);
+                        if (!inputServer.getDisabled().booleanValue()) {
+                            ServerAutoCheckerScheduler.UpdateAlarm(getApplicationContext(), inputServer);
+                        }
+                        Toast.makeText(getApplicationContext(), getString(R.string.activity_server_editor_toast_update, new Object[]{inputServer.getName()}), 1).show();
+                        break;
+                }
+                serverDao.close();
+                setResult(-1, intent);
+                finish();
             }
-        L_0x0036:
-            r1 = r2
-        L_0x0037:
-            switch(r1) {
-                case 0: goto L_0x004f;
-                case 1: goto L_0x00d5;
-                default: goto L_0x003a;
+        });
+        Intent intent = getIntent();
+        String stringExtra = intent.getStringExtra(INTENT_KEYS.ACTION);
+        if (stringExtra.equals(ACTIONS.UPDATE)) {
+            z = true;
+            setTitle(R.string.activity_server_editor_update_server);
+            btnValidate.setText(R.string.activity_server_editor_update_server);
+            ServerDAO serverDAO = new ServerDAO(this);
+            serverDAO.open();
+            server = serverDAO.select(Integer.valueOf(intent.getIntExtra("SERVER_ID", -1)));
+            serverDAO.close();
+        }
+        if (stringExtra.equals(ACTIONS.ADD)) {
+            setTitle(R.string.activity_server_editor_add_server);
+            btnValidate.setText(R.string.activity_server_editor_add_server);
+            server = new Server(Integer.valueOf(1), "", DEFAULT_ADDRESS, DEFAULT_CHECK_INTERVAL, DEFAULT_CHECK_NUMBER_LIMIT);
+            z = false;
+        }
+
+        ((EditText) findViewById(R.id.txtId)).setText(server.getId().toString());
+        ((EditText) findViewById(R.id.txtName)).setText(server.getName());
+        ((EditText) findViewById(R.id.txtAddress)).setText(server.getAddress());
+        ((EditText) findViewById(R.id.txtCheckInterval)).setText(server.getCheckInterval().toString());
+        ((EditText) findViewById(R.id.txtCheckFailThreshold)).setText(server.getCheckFailThreshold().toString());
+        ((Button) findViewById(R.id.btnCancel)).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                setResult(0);
+                finish();
             }
-        L_0x003a:
-            return
-        L_0x003b:
-            java.lang.String r4 = "ADD"
-            boolean r1 = r1.equals(r4)
-            if (r1 == 0) goto L_0x0036
-            r1 = 0
-            goto L_0x0037
-        L_0x0045:
-            java.lang.String r4 = "UPDATE"
-            boolean r1 = r1.equals(r4)
-            if (r1 == 0) goto L_0x0036
-            r1 = r3
-            goto L_0x0037
-        L_0x004f:
-            r12.setTitle(r5)
-            r7.setText(r5)
-            com.shreehariji.servenotifire.data.Server r0 = new com.shreehariji.servenotifire.data.Server
-            java.lang.Integer r1 = java.lang.Integer.valueOf(r3)
-            java.lang.String r2 = ""
-            java.lang.String r3 = "http://"
-            java.lang.Integer r4 = DEFAULT_CHECK_INTERVAL
-            java.lang.Integer r5 = DEFAULT_CHECK_NUMBER_LIMIT
-            r0.<init>(r1, r2, r3, r4, r5)
-        L_0x0066:
-            r1 = 2131624047(0x7f0e006f, float:1.8875263E38)
-            android.view.View r1 = r12.findViewById(r1)
-            android.widget.EditText r1 = (android.widget.EditText) r1
-            java.lang.Integer r2 = r0.getId()
-            java.lang.String r2 = r2.toString()
-            r1.setText(r2)
-            r1 = 2131624050(0x7f0e0072, float:1.8875269E38)
-            android.view.View r1 = r12.findViewById(r1)
-            android.widget.EditText r1 = (android.widget.EditText) r1
-            java.lang.String r2 = r0.getName()
-            r1.setText(r2)
-            r1 = 2131624052(0x7f0e0074, float:1.8875273E38)
-            android.view.View r1 = r12.findViewById(r1)
-            android.widget.EditText r1 = (android.widget.EditText) r1
-            java.lang.String r2 = r0.getAddress()
-            r1.setText(r2)
-            r1 = 2131624054(0x7f0e0076, float:1.8875277E38)
-            android.view.View r1 = r12.findViewById(r1)
-            android.widget.EditText r1 = (android.widget.EditText) r1
-            java.lang.Integer r2 = r0.getCheckInterval()
-            java.lang.String r2 = r2.toString()
-            r1.setText(r2)
-            r1 = 2131624056(0x7f0e0078, float:1.887528E38)
-            android.view.View r1 = r12.findViewById(r1)
-            android.widget.EditText r1 = (android.widget.EditText) r1
-            java.lang.Integer r2 = r0.getCheckFailThreshold()
-            java.lang.String r2 = r2.toString()
-            r1.setText(r2)
-            r1 = 2131624058(0x7f0e007a, float:1.8875285E38)
-            android.view.View r6 = r12.findViewById(r1)
-            android.widget.Button r6 = (android.widget.Button) r6
-            com.shreehariji.servenotifire.activity.ServerEditorActivity$2 r1 = new com.shreehariji.servenotifire.activity.ServerEditorActivity$2
-            r1.<init>()
-            r6.setOnClickListener(r1)
-            goto L_0x003a
-        L_0x00d5:
-            r12.setTitle(r11)
-            r7.setText(r11)
-            com.shreehariji.servenotifire.data.ServerDAO r9 = new com.shreehariji.servenotifire.data.ServerDAO
-            r9.<init>(r12)
-            r9.open()
-            java.lang.String r1 = "SERVER_ID"
-            int r1 = r8.getIntExtra(r1, r2)
-            java.lang.Integer r10 = java.lang.Integer.valueOf(r1)
-            com.shreehariji.servenotifire.data.Server r0 = r9.select(r10)
-            r9.close()
-            goto L_0x0066
-        */
-        super.onCreate(r13);
-        throw new UnsupportedOperationException("Method not decompiled: com.shreehariji.servenotifire.activity.ServerEditorActivity.onCreate(android.os.Bundle):void");
+        });
     }
+
 
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
