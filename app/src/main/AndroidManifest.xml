@@ -47,7 +47,10 @@
         </activity>
 
         <receiver android:name="com.shreehariji.servenotifire.receiver.ServerAutoCheckerReceiver" />
-        <receiver android:name="com.shreehariji.servenotifire.receiver.BootReceiver">
+        <receiver
+            android:name="com.shreehariji.servenotifire.receiver.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -58,8 +61,12 @@
         <service
             android:name=".receiver.TestJobService"
             android:label="Word service"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service
+            android:name=".receiver.SimpleJobIntentService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name="com.shreehariji.servenotifire.widget.OneServerWidgetProvider"

@@ -23,4 +23,5 @@ public class ServerAutoCheckerReceiver extends BroadcastReceiver {
         wakeLock.acquire();
         new ServerChecker(server_check_id, this.context, wakeLock).execute();
     }
+
 }

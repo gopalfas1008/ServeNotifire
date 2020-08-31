@@ -35,6 +35,7 @@ import com.shreehariji.servenotifire.adapter.ServerListCursorAdapter;
 import com.shreehariji.servenotifire.data.Server;
 import com.shreehariji.servenotifire.data.ServerDAO;
 import com.shreehariji.servenotifire.data.WidgetDAO;
+import com.shreehariji.servenotifire.receiver.SimpleJobIntentService;
 import com.shreehariji.servenotifire.receiver.TestJobService;
 import com.shreehariji.servenotifire.tools.ServerAutoCheckerScheduler;
 import com.shreehariji.servenotifire.tools.ServerChecker;
@@ -50,7 +51,9 @@ public class ServerListActivity extends AppCompatActivity {
         public static final int EDIT = 2;
 
         private CONTEXT_MENU_OPTIONS() {
+
         }
+
     }
 
     /* access modifiers changed from: protected */
@@ -69,6 +72,7 @@ public class ServerListActivity extends AppCompatActivity {
         loadServerList();
         ServerAutoCheckerScheduler.InitiateAllAlarms(this);
         TestJobService.scheduleJob(this); // reschedule the job
+        SimpleJobIntentService.setUpdateJob(this); // reschedule the job
         registerUpdateReceiver();
         disableBatteryOptimization();
     }
