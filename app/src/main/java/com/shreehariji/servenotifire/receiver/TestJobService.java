@@ -20,6 +20,7 @@ import com.shreehariji.servenotifire.tools.ServerAutoCheckerScheduler;
  * JobService to be scheduled by the JobScheduler.
  * start another service
  */
+
 @SuppressLint("NewApi")
 public class TestJobService extends JobService {
     private static final String TAG = "SyncService";

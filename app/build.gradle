@@ -8,10 +8,9 @@ android {
     defaultConfig {
         applicationId "com.shreehariji.servenotifire"
         minSdkVersion 18
-        targetSdkVersion 23
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {

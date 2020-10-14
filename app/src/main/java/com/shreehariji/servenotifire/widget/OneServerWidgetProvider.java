@@ -34,7 +34,7 @@ public class OneServerWidgetProvider extends AppWidgetProvider {
             try {
                 WidgetDAO widgetDAO = new WidgetDAO(context);
                 widgetDAO.open();
-                Integer serverId = widgetDAO.getServerOfWidget(Integer.valueOf(appWidgetId));
+                Integer serverId = widgetDAO.getServerOfWidget(appWidgetId);
                 widgetDAO.close();
                 ServerDAO serverDAO = new ServerDAO(context);
                 serverDAO.open();
@@ -51,7 +51,7 @@ public class OneServerWidgetProvider extends AppWidgetProvider {
                 views.setTextViewText(R.id.widgetTxtServerName, server.getName());
                 switch (server.getCheckStatus().intValue()) {
                     case 0:
-                        image_res = Integer.valueOf(R.drawable.ic_close_24dp);
+                        image_res = R.drawable.ic_close_24dp;
                         break;
                     case 1:
                         image_res = Integer.valueOf(R.drawable.ic_check_24dp);

@@ -20,12 +20,12 @@ public class SimpleJobIntentService extends JobIntentService {
     /**
      * Unique job ID for this service.
      */
+
     static final int JOB_ID = 1000;
 
     @SuppressLint("NewApi")
     public static void setUpdateJob(Context context) {
-        JobInfo job =
-                new JobInfo.Builder(
+        JobInfo job = new JobInfo.Builder(
                         JOB_ID,
                         new ComponentName(context, SimpleJobIntentService.class))
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)

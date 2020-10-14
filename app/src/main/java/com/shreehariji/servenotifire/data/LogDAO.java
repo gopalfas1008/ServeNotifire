@@ -19,7 +19,7 @@ public class LogDAO extends DAOBase {
     public long add(String logText) {
         ContentValues values = new ContentValues();
         values.put(LOG_TEXT, logText);
-        values.put(LOG_TIMESTAMP, Long.valueOf(System.currentTimeMillis() / 1000));
+        values.put(LOG_TIMESTAMP, System.currentTimeMillis() / 1000);
         return this.mDb.insert(LOG_TABLE_NAME, null, values);
     }
 
