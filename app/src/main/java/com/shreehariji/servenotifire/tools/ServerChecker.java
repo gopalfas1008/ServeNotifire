@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import com.shreehariji.servenotifire.R;
 import com.shreehariji.servenotifire.activity.ServerListActivity;
@@ -28,9 +29,12 @@ import com.shreehariji.servenotifire.data.ServerDAO;
 import com.shreehariji.servenotifire.data.WidgetDAO;
 import com.shreehariji.servenotifire.widget.OneServerWidgetProvider;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ServerChecker extends AsyncTask<Void, Void, Void> {
@@ -75,13 +79,41 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
                 HttpURLConnection connection = (HttpURLConnection) new URL(this.server.getAddress()).openConnection();
                 connection.setConnectTimeout(Integer.parseInt(prefs.getString("timeout", String.valueOf(this.context.getResources().getInteger(R.integer.default_timeout)))) * 1000);
                 connection.connect();
+
                 this.connectionInfo = connection.getResponseCode() + " " + connection.getResponseMessage();
-                Log.i("Server check code",this.server.getAddress()+"=="+connection.getResponseCode()+"");
-                if (connection.getResponseCode()<500){
-                    this.server.setCheckStatus(1);
+                String responseString="";
+                if(server.getAddress().contains("mms")) {
+                    try {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        ArrayList<String> response = new ArrayList<>();
+                        String responseLine = null;
+//                String responseLine =  br.lines().collect(Collectors.joining("\n"));
+                        while ((responseLine = br.readLine()) != null) {
+                            responseString +=responseLine;
+                        }
+//                        responseString = TextUtils.join("\n", response);
+                    } catch (Exception e) {
+                        responseString = e.getMessage();
+                    }
+                    if (connection.getResponseCode() < 500) {
+                        if(!responseString.equals("0")) {
+                            this.server.setCheckStatus(0);
+                        }else {
+                            this.server.setCheckStatus(1);
+                        }
+                    } else {
+                            this.server.setCheckStatus(0);
+                    }
                 }else {
-                    this.server.setCheckStatus(0);
+                    if (connection.getResponseCode() < 500) {
+                        this.server.setCheckStatus(1);
+                    } else {
+                        this.server.setCheckStatus(0);
+                    }
                 }
+                Log.i("Server check code", this.server.getAddress() + " =" + connection.getResponseCode() + " Res=" + responseString);
+
+
                 connection.disconnect();
             } catch (Exception e) {
                 Log.i("Server check error", e.toString());
@@ -233,16 +265,16 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
 
     private void writeLog() {
         Integer logs_depth = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this.context).getString("logs_depth", String.valueOf(this.context.getResources().getInteger(R.integer.default_logs_depth))));
-        if (logs_depth.intValue() > 0) {
+        if (logs_depth > 0) {
             LogDAO logDAO = new LogDAO(this.context);
             logDAO.open();
-            StringBuilder append = new StringBuilder().append("<font color='").append(this.server.getCheckStatus().intValue() == 1 ? "#00C407" : "#FF0000").append("'>");
+            StringBuilder append = new StringBuilder().append("<font color='").append(this.server.getCheckStatus() == 1 ? "#00C407" : "#FF0000").append("'>");
             Context context2 = this.context;
             String[] strArr = new String[3];
             strArr[0] = this.server.getName();
             strArr[1] = this.server.getAddress();
-            strArr[2] = this.context.getString(this.server.getCheckStatus().intValue() == 1 ? R.string.receiver_server_check_log_online : R.string.receiver_server_check_log_offline) + " (" + this.connectionInfo + ")";
-            logDAO.add(append.append(context2.getString(R.string.receiver_server_check_log, strArr)).append("</font>").toString());
+            strArr[2] = this.context.getString(this.server.getCheckStatus() == 1 ? R.string.receiver_server_check_log_online : R.string.receiver_server_check_log_offline) + " (" + this.connectionInfo + ")";
+            logDAO.add(this.server.getId(),append.append(context2.getString(R.string.receiver_server_check_log, strArr)).append("</font>").toString());
             logDAO.deleteOld(logs_depth);
             logDAO.close();
         }

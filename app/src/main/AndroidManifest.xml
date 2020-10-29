@@ -52,6 +52,7 @@
         <receiver android:name="com.shreehariji.servenotifire.receiver.ServerAutoCheckerReceiver"
             android:enabled="true"
             android:exported="true"/>
+
         <receiver
             android:name="com.shreehariji.servenotifire.receiver.BootReceiver"
             android:enabled="true"
@@ -84,6 +85,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/one_server_widget_info" />
         </receiver>
+
+
     </application>
 
 </manifest>
