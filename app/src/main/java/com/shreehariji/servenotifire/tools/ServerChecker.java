@@ -1,5 +1,6 @@
 package com.shreehariji.servenotifire.tools;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -33,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +69,7 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
     public Void doInBackground(Void... params) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
         NetworkInfo activeNetwork = ((ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (activeNetwork == null || !activeNetwork.isConnected()) {
+        if (activeNetwork == null || !activeNetwork.isConnected()||!hasInternetConnected(context)) {
             this.server.setCheckStatus(3);
         } else {
             if (activeNetwork.isRoaming()) {
@@ -164,12 +166,13 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
         }
         updateServerData();
         updateUI();
-        if (Arrays.asList(new Integer[]{Integer.valueOf(1), Integer.valueOf(0)}).contains(this.server.getCheckStatus())) {
+        if (Arrays.asList(new Integer[]{1, 0}).contains(this.server.getCheckStatus())) {
             writeLog();
         }
         this.wakeLock.release();
     }
 
+    @SuppressLint("WrongConstant")
     private void notifyOfflineServer() {
         String contentText;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
@@ -278,5 +281,21 @@ public class ServerChecker extends AsyncTask<Void, Void, Void> {
             logDAO.deleteOld(logs_depth);
             logDAO.close();
         }
+    }
+
+    public Boolean  hasInternetConnected(Context context){
+//        return false;
+        try {
+                HttpURLConnection connection =  (HttpURLConnection)new URL("https://www.google.com").openConnection();
+                connection.setRequestProperty("User-Agent", "ConnectionTest");
+                connection.setRequestProperty("Connection", "close");
+                connection.setConnectTimeout(10000);
+                connection.connect();
+                Log.d("classTag", "hasInternetConnected: ${(connection.responseCode == 200)}");
+                return (connection.getResponseCode() == 200);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
     }
 }
