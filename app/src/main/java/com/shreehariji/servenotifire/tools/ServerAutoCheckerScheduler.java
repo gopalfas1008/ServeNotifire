@@ -20,7 +20,7 @@ public class ServerAutoCheckerScheduler {
             Server server = ServerDAO.cursorToServer(cursor);
             Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
             intent.putExtra("SERVER_ID", server.getId());
-            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, (long) (server.getCheckInterval() * 60 * 1000), PendingIntent.getBroadcast(context, server.getId(), intent, 0));
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, (long) (server.getCheckInterval() * 60 * 1000), PendingIntent.getBroadcast(context, server.getId(), intent, 0));
             Log.i("Alarm created (boot)", server.getAddress());
         }
         serverDAO.close();
@@ -31,7 +31,7 @@ public class ServerAutoCheckerScheduler {
         Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
         intent.putExtra("SERVER_ID", server.getId());
         int interval = server.getCheckInterval() * 60 * 1000;
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId(), intent, 0));
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId(), intent, 0));
         Log.i("Alarm added", server.getAddress());
     }
 
@@ -40,7 +40,7 @@ public class ServerAutoCheckerScheduler {
         Intent intent = new Intent(context, ServerAutoCheckerReceiver.class);
         intent.putExtra("SERVER_ID", server.getId());
         int interval = server.getCheckInterval() * 60 * 1000;
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId().intValue(), intent, 268435456));
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, (long) interval, (long) interval, PendingIntent.getBroadcast(context, server.getId().intValue(), intent, 268435456));
         Log.i("Alarm updated", server.getAddress());
     }
 
