@@ -15,12 +15,15 @@ import com.shreehariji.servenotifire.data.LogDAO;
 
 public class LogsActivity extends AppCompatActivity {
     /* access modifiers changed from: protected */
+    int server_id=0;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView((int) R.layout.activity_logs);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_logs));
+
+//        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_logs));
         setupActionBar();
-        loadLogs();
+        server_id= getIntent().getIntExtra("server_id",0);
+        loadLogs(server_id);
     }
 
     private void setupActionBar() {
@@ -41,23 +44,23 @@ public class LogsActivity extends AppCompatActivity {
                 onBackPressed();
                 return true;
             case R.id.action_logs_refresh /*2131624099*/:
-                loadLogs();
+                loadLogs(server_id);
                 break;
             case R.id.action_logs_clear /*2131624100*/:
                 LogDAO logDAO = new LogDAO(getApplicationContext());
                 logDAO.open();
                 logDAO.deleteAll();
                 logDAO.close();
-                loadLogs();
+                loadLogs(server_id);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadLogs() {
+    private void loadLogs(int server) {
         LogDAO logDAO = new LogDAO(getApplicationContext());
         logDAO.open();
-        ((ListView) findViewById(R.id.log_list)).setAdapter(new LogsCursorAdapter(this, logDAO.selectAll()));
+        ((ListView) findViewById(R.id.log_list)).setAdapter(new LogsCursorAdapter(this, logDAO.selectAll(server)));
         logDAO.close();
     }
 }

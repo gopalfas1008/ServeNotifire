@@ -25,7 +25,7 @@ public class Server {
     }
 
     public Server(Integer _id, String _name, String _address, Integer _checkInterval, Integer _checkNumber) {
-        this(_id, _name, _address, _checkInterval, _checkNumber, Integer.valueOf(0), Integer.valueOf(2), Long.valueOf(System.currentTimeMillis() / 1000), Boolean.valueOf(false));
+        this(_id, _name, _address, _checkInterval, _checkNumber, 0, 2, System.currentTimeMillis() / 1000, Boolean.FALSE);
     }
 
     public Server(Integer _id, String _name, String _address, Integer _checkInterval, Integer _checkFailThreshold, Integer _checkFailCount, Integer _checkStatus, Long _checkTimestamp, Boolean _disabled) {

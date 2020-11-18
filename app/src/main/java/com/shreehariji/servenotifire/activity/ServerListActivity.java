@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.PowerManager;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -34,6 +35,8 @@ import com.shreehariji.servenotifire.adapter.ServerListCursorAdapter;
 import com.shreehariji.servenotifire.data.Server;
 import com.shreehariji.servenotifire.data.ServerDAO;
 import com.shreehariji.servenotifire.data.WidgetDAO;
+import com.shreehariji.servenotifire.receiver.SimpleJobIntentService;
+import com.shreehariji.servenotifire.receiver.TestJobService;
 import com.shreehariji.servenotifire.tools.ServerAutoCheckerScheduler;
 import com.shreehariji.servenotifire.tools.ServerChecker;
 
@@ -48,22 +51,28 @@ public class ServerListActivity extends AppCompatActivity {
         public static final int EDIT = 2;
 
         private CONTEXT_MENU_OPTIONS() {
+
         }
+
     }
 
     /* access modifiers changed from: protected */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView((int) R.layout.activity_server_list);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+//        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ((FloatingActionButton) findViewById(R.id.addServer)).setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                Intent intent = new Intent(ServerListActivity.this.getApplicationContext(), ServerEditorActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ServerEditorActivity.class);
                 intent.putExtra(ServerEditorActivity.INTENT_KEYS.ACTION, ServerEditorActivity.ACTIONS.ADD);
-                ServerListActivity.this.startActivityForResult(intent, 1);
+                startActivityForResult(intent, 1);
             }
         });
+
         loadServerList();
+        ServerAutoCheckerScheduler.InitiateAllAlarms(this);
+        TestJobService.scheduleJob(this); // reschedule the job
+        SimpleJobIntentService.setUpdateJob(this); // reschedule the job
         registerUpdateReceiver();
         disableBatteryOptimization();
     }
@@ -72,10 +81,10 @@ public class ServerListActivity extends AppCompatActivity {
         this.serverListReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 Log.i("ServerListReceiver", "loadServerList()");
-                ServerListActivity.this.loadServerList();
+                loadServerList();
             }
         };
-        registerReceiver(this.serverListReceiver, new IntentFilter("com.com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
+        registerReceiver(this.serverListReceiver, new IntentFilter("com.shreehariji.servenotifire.UPDATE_SERVER_LIST"));
     }
 
     public void onDestroy() {
@@ -121,6 +130,7 @@ public class ServerListActivity extends AppCompatActivity {
                 view.showContextMenu();
             }
         });
+
         findViewById(R.id.lblEmptyList).setVisibility(cursor.getCount() > 0 ? 8 : 0);
     }
 

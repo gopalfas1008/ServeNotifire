@@ -46,7 +46,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
-    @TargetApi(11)
     public static class MainSettingsFragment extends PreferenceFragment {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);

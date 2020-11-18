@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shreehariji.servenotifire">
-    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="23"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+    <uses-sdk android:targetSdkVersion="23" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
         <activity
             android:name="com.shreehariji.servenotifire.activity.ServerListActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,8 +40,7 @@
         <activity
             android:name="com.shreehariji.servenotifire.activity.LogsActivity"
             android:label="@string/activity_logs_title"
-            android:parentActivityName="com.shreehariji.servenotifire.activity.ServerListActivity"
-            android:theme="@style/Theme.Design.NoActionBar" />
+            android:parentActivityName="com.shreehariji.servenotifire.activity.ServerListActivity" />
         <activity
             android:name="com.shreehariji.servenotifire.activity.ServerSelectActivity"
             android:label="@string/activity_server_select_title">
@@ -43,14 +48,31 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-        <receiver android:name="com.shreehariji.servenotifire.receiver.ServerAutoCheckerReceiver" />
-        <receiver android:name="com.shreehariji.servenotifire.receiver.BootReceiver">
+
+        <receiver android:name="com.shreehariji.servenotifire.receiver.ServerAutoCheckerReceiver"
+            android:enabled="true"
+            android:exported="true"/>
+
+        <receiver
+            android:name="com.shreehariji.servenotifire.receiver.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".receiver.TestJobService"
+            android:label="Word service"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".receiver.SimpleJobIntentService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name="com.shreehariji.servenotifire.widget.OneServerWidgetProvider"
@@ -63,6 +85,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/one_server_widget_info" />
         </receiver>
+
+
     </application>
 
 </manifest>
